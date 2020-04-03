@@ -13,25 +13,33 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Mod("SubDirModLocator")
+@Mod("subdirmodlocator")
 public class SubDirModLocator extends AbstractJarFileLocator {
 
     private String version;
+
+    {
+        System.out.println("SubDirModLocator");
+    }
 
     @Override
     public List<IModFile> scanMods() {
         List<Path> excluded = ModDirTransformerDiscoverer.allExcluded(); // want to keep the same behavior as forge, this shouldn't be used as a bypass
         final Path folder = FMLPaths.MODSDIR.get().resolve(this.version);
-
-        return LamdbaExceptionUtils.uncheck(() ->
-            Files.list(folder)
-            .filter(p -> !excluded.contains(p))
-            .filter(p -> p.getFileName().toString().toLowerCase().endsWith(".jar"))
-            .sorted(Comparator.comparing(p -> p.getFileName().toString(), String.CASE_INSENSITIVE_ORDER))
-            .map(p -> new ModFile(p, this))
-            .peek(f -> this.modJars.compute(f, (mf, fs) -> this.createFileSystem(mf)))
-            .collect(Collectors.toList())
-        );
+        
+        if (Files.exists(folder)) {
+            return LamdbaExceptionUtils.uncheck(() ->
+                Files.list(folder)
+                    .filter(p -> !excluded.contains(p))
+                    .filter(p -> p.getFileName().toString().toLowerCase().endsWith(".jar"))
+                    .sorted(Comparator.comparing(p -> p.getFileName().toString(), String.CASE_INSENSITIVE_ORDER))
+                    .map(p -> new ModFile(p, this))
+                    .peek(f -> this.modJars.compute(f, (mf, fs) -> this.createFileSystem(mf)))
+                    .collect(Collectors.toList())
+            );
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
