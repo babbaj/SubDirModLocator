@@ -18,15 +18,11 @@ public class SubDirModLocator extends AbstractJarFileLocator {
 
     private String version;
 
-    {
-        System.out.println("SubDirModLocator");
-    }
-
     @Override
     public List<IModFile> scanMods() {
         List<Path> excluded = ModDirTransformerDiscoverer.allExcluded(); // want to keep the same behavior as forge, this shouldn't be used as a bypass
         final Path folder = FMLPaths.MODSDIR.get().resolve(this.version);
-        
+
         if (Files.exists(folder)) {
             return LamdbaExceptionUtils.uncheck(() ->
                 Files.list(folder)
