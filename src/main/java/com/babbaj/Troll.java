@@ -11,13 +11,11 @@ import joptsimple.OptionSet;
 import net.minecraftforge.fml.loading.ModDirTransformerDiscoverer;
 
 import javax.annotation.Nonnull;
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.JarURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,6 +34,7 @@ public class Troll implements ITransformationService {
         try {
             final Method addUrl = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             addUrl.setAccessible(true);
+            // TODO: get game dir correctly
             final Path mods = Paths.get("mods/" + getGameVersion());
             if (Files.exists(mods)) {
                 Files.list(mods)
@@ -56,19 +55,11 @@ public class Troll implements ITransformationService {
 
     }
 
-    public static Path getOurPath() {
-        final String thisPath = Troll.class.getName().replace('.', '/') + ".class";
-        final URL url = Troll.class.getClassLoader().getResource(thisPath);
-
+    // Not sure if its okay for this to not be a jar
+    private static Path getOurPath() {
         try {
-            URLConnection connection = url.openConnection();
-            if (connection instanceof JarURLConnection) {
-                return new File(((JarURLConnection) connection).getJarFileURL().toURI()).toPath();
-            } else {
-                throw new IllegalStateException("URLConnection is not a JarURLConnection");
-            }
-        } catch (Exception ex) {
-            // we aren't a jar or something lol
+            return Paths.get(Troll.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+        } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
     }
