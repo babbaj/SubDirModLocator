@@ -1,7 +1,6 @@
 package com.babbaj;
 
 import cpw.mods.modlauncher.api.LamdbaExceptionUtils;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.ModDirTransformerDiscoverer;
 import net.minecraftforge.fml.loading.moddiscovery.AbstractJarFileLocator;
@@ -15,7 +14,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
-@Mod("subdirmodlocator")
 public class SubDirModLocator extends AbstractJarFileLocator {
 
     private String version;
@@ -34,14 +32,15 @@ public class SubDirModLocator extends AbstractJarFileLocator {
                     .map(p -> new ModFile(p, this))
                     .peek(f -> this.modJars.compute(f, (mf, fs) -> this.createFileSystem(mf)))
                     .collect(Collectors.toList());
-                {
+                // TODO: there might be other services other than ITransformationService that currently dont work
+                /*{
                     final List<IModFile> badMods = mods.stream()
                         .filter(mf -> hasTransformerService(mf.getFilePath()))
                         .collect(Collectors.toList());
                     if (!badMods.isEmpty()) {
                         throw new IllegalStateException("Mods with ITransformationServices can not be loaded properly: " + badMods);
                     }
-                }
+                }*/
 
                 return mods;
             });
