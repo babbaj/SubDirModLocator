@@ -28,19 +28,11 @@ public class SubDirModLocator extends AbstractJarFileLocator {
                 final List<IModFile> mods = Files.list(folder)
                     .filter(p -> !excluded.contains(p))
                     .filter(p -> p.getFileName().toString().toLowerCase().endsWith(".jar"))
+                    .filter(p -> !hasTransformerService(p))
                     .sorted(Comparator.comparing(p -> p.getFileName().toString(), String.CASE_INSENSITIVE_ORDER))
                     .map(p -> new ModFile(p, this))
                     .peek(f -> this.modJars.compute(f, (mf, fs) -> this.createFileSystem(mf)))
                     .collect(Collectors.toList());
-                // TODO: there might be other services other than ITransformationService that currently dont work
-                /*{
-                    final List<IModFile> badMods = mods.stream()
-                        .filter(mf -> hasTransformerService(mf.getFilePath()))
-                        .collect(Collectors.toList());
-                    if (!badMods.isEmpty()) {
-                        throw new IllegalStateException("Mods with ITransformationServices can not be loaded properly: " + badMods);
-                    }
-                }*/
 
                 return mods;
             });

@@ -26,7 +26,6 @@ import java.util.Set;
 
 public class Troll implements ITransformationService {
 
-
     public Troll() {
         // If this fails then we were probably loaded by the default classloader
         // which should only happen in debug when we in the classpath
@@ -37,6 +36,7 @@ public class Troll implements ITransformationService {
             // TODO: get game dir correctly
             final Path mods = Paths.get("mods/" + getGameVersion());
             if (Files.exists(mods)) {
+                ModDirTransformerDiscoverer.getExtraLocators().add(getOurPath());
                 Files.list(mods)
                     .forEach(p -> {
                         try {
@@ -48,7 +48,6 @@ public class Troll implements ITransformationService {
                         }
                     });
             }
-            ModDirTransformerDiscoverer.getExtraLocators().add(getOurPath());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
